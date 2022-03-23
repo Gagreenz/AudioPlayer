@@ -4,11 +4,11 @@ namespace AudioPlayer
     public partial class Form1 : Form
     {
         private string SongFolderPath = @"D:/";
-        private int SongsPtr;
+
+        SongManager songManager;
         private AudioFileReader audioFile;
         private WaveOutEvent outputDevice;
-        ////TODO: Maybe I need to create class with indexer and List<Song> Which can detect position and work with it
-        private List<Song> songs;
+
         /// <summary>
         /// Count of seconds in the song
         /// </summary>
@@ -37,23 +37,21 @@ namespace AudioPlayer
                 outputDevice.PlaybackStopped += OnPlaybackStopped;
                 outputDevice.Volume = 1f;
             }
-            songs = new List<Song>();
+            songManager = new SongManager(new List<Song>());
             FindMusic();
-            SongsPtr = 0;
 
-
-            outputDevice.Init(getAudioFile());
+            NextSong();
 
             VolumeBar.Value = 100;
         }
 
         private void FindMusic()
         {
-            var dir = Directory.GetFiles(SongFolderPath,"*.mp3");
+            var dir = Directory.GetFiles(SongFolderPath, "*.mp3");
             foreach (var file in dir)
             {
                 //TODO: Naming for song
-                songs.Add(new Song(file,file));
+                songManager.AddSong(new Song(file, file));
                 SongsList.Items.Add(file);
             }
         }
@@ -75,22 +73,28 @@ namespace AudioPlayer
                 MessageBox.Show(ex.ToString());
             }
         }
-        private AudioFileReader getAudioFile()
-        {
-            if (audioFile != null) audioFile.Dispose();
-            if (SongsPtr == songs.Count) SongsPtr = 0;
-
-            audioFile = new AudioFileReader(songs[SongsPtr++].Path);
-            SongTotalTime = audioFile.TotalTime.Seconds + audioFile.TotalTime.Minutes * 60;
-
-            ResetScreen();
-
-            return audioFile;
-        }
         private void NextSong()
         {
             outputDevice?.Stop();
-            outputDevice.Init(getAudioFile());
+
+            audioFile = new AudioFileReader(songManager.GetNextSong().Path);
+            ResetScreen();
+
+            outputDevice?.Init(audioFile);
+
+            if (PlayButton.Text == "Stop")
+            {
+                outputDevice?.Play();
+            }
+        }
+        private void PrevSong()
+        {
+            outputDevice?.Stop();
+
+            audioFile = new AudioFileReader(songManager.GetPrevSong().Path);
+            ResetScreen();
+
+            outputDevice?.Init(audioFile);
 
             if (PlayButton.Text == "Stop")
             {
@@ -100,14 +104,12 @@ namespace AudioPlayer
 
         private void PrevSongButton_Click(object sender, EventArgs e)
         {
-            if (SongsPtr == 1) SongsPtr = songs.Count - 1;
-            else SongsPtr-= 2;
-            NextSong();
+            PrevSong();
         }
 
         private void PlayButton_Click(object sender, EventArgs e)
         {
-            if(PlayButton.Text == "Play")
+            if (PlayButton.Text == "Play")
             {
                 outputDevice?.Play();
                 PlayButton.Text = "Stop";
@@ -117,7 +119,7 @@ namespace AudioPlayer
                 outputDevice?.Stop();
                 PlayButton.Text = "Play";
             }
-            
+
         }
 
         private void NextSongButton_Click(object sender, EventArgs e)
@@ -127,12 +129,15 @@ namespace AudioPlayer
 
         private void MixSongButton_Click(object sender, EventArgs e)
         {
-            songs.Shuffle();
+            songManager.ShuffleSongs();
         }
-        
+
         private void SongProgressBar_Scroll(object sender, EventArgs e)
         {
-
+            if (audioFile != null)
+            {
+                audioFile.CurrentTime = TimeSpan.FromSeconds(SongProgressBar.Value);
+            }
         }
 
         private void VolumeBar_Scroll(object sender, EventArgs e)
