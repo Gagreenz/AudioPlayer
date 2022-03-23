@@ -8,10 +8,10 @@
         ///  In future
         /// </summary>
         public Image SongImage { get; set; }
-        public Song(string _name,string _path)
+        public Song(string name,string path)
         {
-            Name = _name;
-            Path = _path;
+            Name = name;
+            Path = path;
         }
     }
 }
