@@ -5,10 +5,11 @@ namespace AudioPlayer
     {
         private string _songFolderPath = @"D:/";
 
-        AudioManager audioManager;
+        IAudioManager audioManager;
         private AudioFileReader audioFile;
         private WaveOutEvent outputDevice;
 
+        private bool threadPause;
         /// <summary>
         /// Count of seconds in the song
         /// </summary>
@@ -29,6 +30,29 @@ namespace AudioPlayer
 
             CurrentSongName.Text = audioFile.FileName;
         }
+        private void TimeUpdate()
+        {
+            SongProgressBar.Value = (int)audioFile.CurrentTime.TotalSeconds;
+            CurrentTimeLabel.Text = audioFile.CurrentTime.ToString(@"hh\:mm\:ss");
+        }
+        private void ThreadUpdatePlayback()
+        {
+            while (true)
+            {
+                if (!threadPause)
+                {
+                    try
+                    {
+                        Invoke(TimeUpdate, new object[] { });
+                    }
+                    catch (Exception e)
+                    {
+                        break;
+                    }
+                }
+                Thread.Sleep(1000);
+            }
+        }
         private void Init()
         {
             if (outputDevice == null)
@@ -43,6 +67,9 @@ namespace AudioPlayer
             SetNextSong(audioManager.GetNextSong());
 
             VolumeBar.Value = 100;
+
+            Thread thread = new Thread(ThreadUpdatePlayback);
+            thread.Start();
         }
 
         private void FindMusic()
@@ -78,9 +105,9 @@ namespace AudioPlayer
             outputDevice?.Stop();
 
             audioFile = new AudioFileReader(song.Path);
-            ResetScreen();
-
+ 
             SongTotalTime = audioFile.TotalTime.Seconds + audioFile.TotalTime.Minutes * 60;
+            ResetScreen();
 
             outputDevice?.Init(audioFile);
 
@@ -101,11 +128,13 @@ namespace AudioPlayer
         {
             if (PlayButton.Text == "Play")
             {
+                threadPause = false;
                 outputDevice?.Play();
                 PlayButton.Text = "Stop";
             }
             else
             {
+                threadPause = true;
                 outputDevice?.Stop();
                 PlayButton.Text = "Play";
             }
