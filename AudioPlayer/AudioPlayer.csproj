@@ -10,6 +10,10 @@
 
   <ItemGroup>
     <PackageReference Include="NAudio" Version="2.0.1" />
+	<!--Зависимость от VK API без необходимости вручную получать токен-->
+        <PackageReference Include="VkNet" Version="1.56.0" />
+        <!--Доступ к своим сообщениям, комментариям и музыке-->
+        <PackageReference Include="VkNet.AudioBypassService" Version="1.7.0" />
   </ItemGroup>
 
 </Project>

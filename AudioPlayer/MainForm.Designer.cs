@@ -37,12 +37,12 @@
             this.VolumeBar = new System.Windows.Forms.TrackBar();
             this.Volume = new System.Windows.Forms.Label();
             this.CurrentSongName = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.CurrentTimeLabel = new System.Windows.Forms.Label();
             this.TotalTimeLabel = new System.Windows.Forms.Label();
+            this.FileButton = new System.Windows.Forms.Button();
+            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             ((System.ComponentModel.ISupportInitialize)(this.SongProgressBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.VolumeBar)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // PlayButton
@@ -87,20 +87,23 @@
             // 
             // SongProgressBar
             // 
+            this.SongProgressBar.Cursor = System.Windows.Forms.Cursors.Default;
             this.SongProgressBar.Location = new System.Drawing.Point(54, 41);
             this.SongProgressBar.Name = "SongProgressBar";
             this.SongProgressBar.Size = new System.Drawing.Size(147, 45);
             this.SongProgressBar.TabIndex = 4;
+            this.SongProgressBar.TickStyle = System.Windows.Forms.TickStyle.None;
             this.SongProgressBar.Scroll += new System.EventHandler(this.SongProgressBar_Scroll);
             // 
             // SongsList
             // 
             this.SongsList.FormattingEnabled = true;
             this.SongsList.ItemHeight = 15;
-            this.SongsList.Location = new System.Drawing.Point(12, 79);
+            this.SongsList.Location = new System.Drawing.Point(12, 64);
             this.SongsList.Name = "SongsList";
             this.SongsList.Size = new System.Drawing.Size(176, 169);
             this.SongsList.TabIndex = 5;
+            this.SongsList.DoubleClick += new System.EventHandler(this.ListBox_DoubleCLick);
             // 
             // VolumeBar
             // 
@@ -124,19 +127,11 @@
             // CurrentSongName
             // 
             this.CurrentSongName.AutoSize = true;
-            this.CurrentSongName.Location = new System.Drawing.Point(248, 60);
+            this.CurrentSongName.Location = new System.Drawing.Point(193, 64);
             this.CurrentSongName.Name = "CurrentSongName";
             this.CurrentSongName.Size = new System.Drawing.Size(106, 15);
             this.CurrentSongName.TabIndex = 8;
             this.CurrentSongName.Text = "CurrentSongName";
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Location = new System.Drawing.Point(248, 79);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(106, 169);
-            this.pictureBox1.TabIndex = 9;
-            this.pictureBox1.TabStop = false;
             // 
             // CurrentTimeLabel
             // 
@@ -156,14 +151,24 @@
             this.TotalTimeLabel.TabIndex = 11;
             this.TotalTimeLabel.Text = "00:00:00";
             // 
+            // FileButton
+            // 
+            this.FileButton.Location = new System.Drawing.Point(12, 231);
+            this.FileButton.Name = "FileButton";
+            this.FileButton.Size = new System.Drawing.Size(176, 23);
+            this.FileButton.TabIndex = 12;
+            this.FileButton.Text = "Open files directory";
+            this.FileButton.UseVisualStyleBackColor = true;
+            this.FileButton.Click += new System.EventHandler(this.FileButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(413, 266);
+            this.ClientSize = new System.Drawing.Size(377, 266);
+            this.Controls.Add(this.FileButton);
             this.Controls.Add(this.TotalTimeLabel);
             this.Controls.Add(this.CurrentTimeLabel);
-            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.CurrentSongName);
             this.Controls.Add(this.Volume);
             this.Controls.Add(this.VolumeBar);
@@ -175,10 +180,9 @@
             this.Controls.Add(this.PlayButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "AudioPlayer";
             ((System.ComponentModel.ISupportInitialize)(this.SongProgressBar)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.VolumeBar)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -195,8 +199,10 @@
         private TrackBar VolumeBar;
         private Label Volume;
         private Label CurrentSongName;
-        private PictureBox pictureBox1;
         private Label CurrentTimeLabel;
         private Label TotalTimeLabel;
+        private OpenFileDialog openFile;
+        private Button FileButton;
+        private FolderBrowserDialog folderBrowserDialog1;
     }
 }
