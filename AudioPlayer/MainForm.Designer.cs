@@ -1,6 +1,6 @@
 ﻿namespace AudioPlayer
 {
-    partial class Form1
+    partial class MainPage
     {
         /// <summary>
         ///  Required designer variable.
@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.PlayButton = new System.Windows.Forms.Button();
             this.PrevSongButton = new System.Windows.Forms.Button();
             this.NextSongButton = new System.Windows.Forms.Button();
@@ -41,6 +42,7 @@
             this.TotalTimeLabel = new System.Windows.Forms.Label();
             this.FileButton = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.SongProgressBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.VolumeBar)).BeginInit();
             this.SuspendLayout();
@@ -101,9 +103,9 @@
             this.SongsList.ItemHeight = 15;
             this.SongsList.Location = new System.Drawing.Point(12, 64);
             this.SongsList.Name = "SongsList";
-            this.SongsList.Size = new System.Drawing.Size(176, 169);
+            this.SongsList.Size = new System.Drawing.Size(230, 169);
             this.SongsList.TabIndex = 5;
-            this.SongsList.DoubleClick += new System.EventHandler(this.ListBox_DoubleCLick);
+            this.SongsList.DoubleClick += new System.EventHandler(this.SongsList_DoubleClicked);
             // 
             // VolumeBar
             // 
@@ -127,7 +129,7 @@
             // CurrentSongName
             // 
             this.CurrentSongName.AutoSize = true;
-            this.CurrentSongName.Location = new System.Drawing.Point(193, 64);
+            this.CurrentSongName.Location = new System.Drawing.Point(248, 64);
             this.CurrentSongName.Name = "CurrentSongName";
             this.CurrentSongName.Size = new System.Drawing.Size(106, 15);
             this.CurrentSongName.TabIndex = 8;
@@ -155,13 +157,13 @@
             // 
             this.FileButton.Location = new System.Drawing.Point(12, 231);
             this.FileButton.Name = "FileButton";
-            this.FileButton.Size = new System.Drawing.Size(176, 23);
+            this.FileButton.Size = new System.Drawing.Size(230, 23);
             this.FileButton.TabIndex = 12;
             this.FileButton.Text = "Open files directory";
             this.FileButton.UseVisualStyleBackColor = true;
             this.FileButton.Click += new System.EventHandler(this.FileButton_Click);
             // 
-            // Form1
+            // MainPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -179,7 +181,7 @@
             this.Controls.Add(this.PrevSongButton);
             this.Controls.Add(this.PlayButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Name = "Form1";
+            this.Name = "MainPage";
             this.Text = "AudioPlayer";
             ((System.ComponentModel.ISupportInitialize)(this.SongProgressBar)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.VolumeBar)).EndInit();
@@ -204,5 +206,6 @@
         private OpenFileDialog openFile;
         private Button FileButton;
         private FolderBrowserDialog folderBrowserDialog1;
+        private System.Windows.Forms.Timer timer1;
     }
 }
