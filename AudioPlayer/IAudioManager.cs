@@ -3,6 +3,7 @@
     internal interface IAudioManager<T>
         where T : class
     {
+        int Index { get; }
         public void AddSong(T song);
         public void RemoveSong(int index);
         public void ShuffleSongs();

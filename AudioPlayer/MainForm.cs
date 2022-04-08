@@ -36,7 +36,7 @@ namespace AudioPlayer
 
             CurrentSongName.Text = audioFile.FileName;
 
-            SongsList.SelectedIndex = ((AudioManager)audioManager).Index;
+            SongsList.SelectedIndex = audioManager.Index;
         }
         private void TimeUpdate()
         {
@@ -81,12 +81,12 @@ namespace AudioPlayer
             SongsList.Items.Clear();
             FindMusic();
 
-            SongsList.Items.AddRange(((AudioManager)audioManager).Songs.Select(x => x.Name).ToArray());
+            SongsList.Items.AddRange(audioManager.GetSongList().Select(x => x.Name).ToArray());
             SetNextSong(audioManager.GetNextSong());
         }
         private void FindMusic()
         {
-            ((AudioManager)audioManager).Songs.Clear();
+            audioManager.GetSongList().Clear();
             var dir = Directory.GetFiles(_songFolderPath, "*.mp3");
             foreach (var file in dir)
             {

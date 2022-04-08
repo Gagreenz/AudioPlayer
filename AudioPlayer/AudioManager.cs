@@ -28,7 +28,6 @@
             if (song != null)
                 Songs.Add(song);
         }
-
         public Song GetNextSong()
         {
             if(Songs.Count == 0) return null;
@@ -41,22 +40,18 @@
             Index--;
             return Songs[Index];
         }
-
         public void RemoveSong(int index)
         {
             throw new NotImplementedException();
         }
-
         public void ShuffleSongs()
         {
             throw new NotImplementedException();
         }
-
         public List<Song> GetSongList()
         {
             return Songs;
         }
-
         public Song GetSongByIndex(int index)
         {
             Index = index;
