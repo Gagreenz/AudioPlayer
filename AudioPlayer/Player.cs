@@ -9,79 +9,94 @@ namespace AudioPlayer
 {
     internal class Player : IDisposable
     {
+        public event EventHandler<EventArgs> SongChanged;
         public TimeSpan CurrentTime
         {
             get
             {
-                if (audioFile != null) return audioFile.CurrentTime;
-                return new TimeSpan(0,0,0);
+                if (_audioFile != null) return _audioFile.CurrentTime;
+                return new TimeSpan(0, 0, 0);
             }
             set
             {
-                audioFile.CurrentTime = value;
+                _audioFile.CurrentTime = value;
             }
         }
         public TimeSpan TotalTime
         {
             get
             {
-                if (audioFile != null) return audioFile.TotalTime;
+                if (_audioFile != null) return _audioFile.TotalTime;
                 return new TimeSpan(0, 0, 0);
+            }
+        }
+        public string CurrentSongName
+        {
+            get
+            {
+                return _audioFile.FileName;
             }
         }
         public float Volume
         {
-            get { return outputDevice.Volume; }
-            set { outputDevice.Volume = value; }
+            get { return _outputDevice.Volume; }
+            set { _outputDevice.Volume = value; }
         }
-        private IAudioManager<Song> audioManager;
-        private AudioFileReader audioFile;
-        private WaveOutEvent outputDevice;
-        private string SongsFolder = @"D:\";
+        private IAudioManager<Song> _audioManager;
+        private AudioFileReader _audioFile;
+        private WaveOutEvent _outputDevice;
+        private string _songsFolder = @"D:\";
         public Player()
         {
-            outputDevice = new WaveOutEvent();
-            outputDevice.Volume = 1f;
-            outputDevice.PlaybackStopped += OnPlaybackStopped;
+            _outputDevice = new WaveOutEvent();
+            _outputDevice.Volume = 1f;
+            _outputDevice.PlaybackStopped += OnPlaybackStopped;
 
-            audioManager = new AudioManager(new List<Song>());
+            _audioManager = new AudioManager(new List<Song>());
             FindSongsByPath();
-            SetSong(audioManager.GetNextSong());
+        }
+        public void Init()
+        {
+            SetSong(_audioManager.GetNextSong());
         }
         public void Play()
         {
-            outputDevice.Play();
+            _outputDevice.Play();
         }
         public void Stop()
         {
-            outputDevice.Pause();
+            _outputDevice.Pause();
         }
         public void SetNextSong()
         {
-            SetSong(audioManager.GetNextSong());
+            SetSong(_audioManager.GetNextSong());
         }
         public void SetPrevSong()
         {
-            SetSong(audioManager.GetPrevSong());
+            SetSong(_audioManager.GetPrevSong());
         }
         public void SetNewFolder(string path)
         {
-            SongsFolder = path;
+            _songsFolder = path;
             FindSongsByPath();
         }
         public List<Song> GetSongsList()
         {
-            return audioManager.GetSongList();
+            return _audioManager.GetSongList();
+        }
+        public void SetSongByIndex(int index)
+        {
+            SetSong(_audioManager.GetSongByIndex(index));
         }
         private void FindSongsByPath()
         {
-            audioManager.GetSongList().Clear();
-            var directory = Directory.GetFiles(SongsFolder, "*.*").
+            _audioManager.GetSongList().Clear();
+            var directory = Directory.GetFiles(_songsFolder, "*.*").
                 Where(x => x.EndsWith(".mp3") || x.EndsWith(".wav") || x.EndsWith(".mp4"));
             foreach (var path in directory)
             {
                 var song = new Song(path.Split('.')[0], path);
-                audioManager.AddSong(song);
+                _audioManager.AddSong(song);
             }
         }
         private void SetSong(Song song)
@@ -89,30 +104,32 @@ namespace AudioPlayer
             if (song == null) return;
             try
             {
-                var state = outputDevice.PlaybackState;
-                outputDevice.Stop();
+                var state = _outputDevice.PlaybackState;
+                _outputDevice.Stop();
 
-                audioFile = new AudioFileReader(song.Path);
+                _audioFile = new AudioFileReader(song.Path);
 
-                outputDevice.Init(audioFile);
+                _outputDevice.Init(_audioFile);
+               
                 //TODO Fix Auto-start
-                if (state == PlaybackState.Playing) outputDevice.Play();
+                if (state == PlaybackState.Playing) _outputDevice.Play();
             }
             catch (Exception ex)
             {
                 FindSongsByPath();
                 //refresh?
             }
+            SongChanged?.Invoke(this, EventArgs.Empty);
         }
         private void OnPlaybackStopped(object? sender, StoppedEventArgs e)
         {
             try
             {
-                if (audioFile != null)
+                if (_audioFile != null)
                 {
                     if (CurrentTime >= TotalTime)
                     {
-                        SetSong(audioManager.GetNextSong());
+                        SetSong(_audioManager.GetNextSong());
                     }
                 }
             }
@@ -123,13 +140,13 @@ namespace AudioPlayer
         }
         public void Dispose()
         {
-            if (audioFile != null)
+            if (_audioFile != null)
             {
-                audioFile.Dispose();
+                _audioFile.Dispose();
             }
-            if (outputDevice != null)
+            if (_outputDevice != null)
             {
-                outputDevice.Dispose();
+                _outputDevice.Dispose();
             }
         }
     }

@@ -9,90 +9,110 @@ namespace AudioPlayer
 {
     public partial class MainPage : Form
     {
-        Player player;
+        Player _player;
         public MainPage()
         {
             InitializeComponent();
-            Init();
+
+            initialize();
         }
-        public void Init()
+        private void initialize()
         {
-            player = new Player();
-            ScreenRefresh();
-            SongsList.Items.AddRange(player.GetSongsList().
-                    Select(x => x.Name).ToArray());
+            try
+            {
+                _player = new Player();
+                _player.SongChanged += onSongChanged;
+                _player.Init();
+            }
+            catch (Exception)
+            {
+                this.Close();
+                throw;
+            }
 
             timer1.Interval = 1000;
-            timer1.Tick += TimeUpdate;
+            timer1.Tick += timeUpdate;
             timer1.Start();
-        }
-        private void TimeUpdate(object? sender,EventArgs e)
-        {
-            SongProgressBar.Value = (int)player.CurrentTime.TotalSeconds;
-            CurrentTimeLabel.Text = player.CurrentTime.ToString(@"hh\:mm\:ss");
-        }
-        private void ScreenRefresh()
-        {
-            VolumeBar.Value = (int)(player.Volume * 100);
 
-            TotalTimeLabel.Text = player.TotalTime.ToString(@"hh\:mm\:ss");
-            var totalTime = player.TotalTime.Minutes * 60 + player.TotalTime.Seconds;
-            SongProgressBar.Maximum = totalTime;
+            VolumeSongBar.Value = (int)(_player.Volume * 100);
+            SongsList.Items.AddRange(_player.GetSongsList().Select(s => s.Name).ToArray());
+
+            VolumeSongBar.Scroll += VolumeSongBarScroll;
+            SongProgressBar.Scroll += SongProgressBarScroll;
+            SongsList.MouseDoubleClick += onSongsListDoubleClicked;
+            MixSongButton.Click += onMixClicked;
+            NextSongButton.Click += onNextClicked;
+            PrevSongButton.Click += onPrevClicked;
+            PlaySongButton.Click += onPlayClicked;
+        }
+
+        private void timeUpdate(object? sender,EventArgs e)
+        {
+            SongProgressBar.Value = (int)_player.CurrentTime.TotalSeconds;
+            CurrentTimeSong.Text = _player.CurrentTime.ToString(@"hh\:mm\:ss");
+        }
+
+        private void VolumeSongBarScroll(object? sender, EventArgs e)
+        {
+            _player.Volume = (float)VolumeSongBar.Value / 100;
+            Volume.Text = VolumeSongBar.Value.ToString();
+        }
+
+        private void SongProgressBarScroll(object? sender, EventArgs e)
+        {
+            _player.CurrentTime = TimeSpan.FromSeconds(SongProgressBar.Value);
+        }
+
+        private void onPlayClicked(object? sender, EventArgs e)
+        {
+            if(PlaySongButton.Text == "Play")
+            {
+                PlaySongButton.Text = "Stop";
+                _player.Play();
+                return;
+            }
+            if (PlaySongButton.Text == "Stop")
+            {
+                PlaySongButton.Text = "Play";
+                _player.Stop();
+                return;
+            }
+        }
+
+        private void onSongsListDoubleClicked(object? sender, MouseEventArgs e)
+        {
+            _player.SetSongByIndex(SongsList.SelectedIndex);
+        }
+
+        private void onMixClicked(object? sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void onNextClicked(object? sender, EventArgs e)
+        {
+            _player.SetNextSong();
+        }
+
+        private void onPrevClicked(object? sender, EventArgs e)
+        {
+            _player.SetPrevSong();
+        }
+
+        /// <summary>
+        /// Refresh data on form
+        /// </summary>
+        private void onSongChanged(object? sender,EventArgs e)
+        {
+            SongName.Text = _player.CurrentSongName;
+            SongProgressBar.Maximum = _player.TotalTime.Seconds + _player.TotalTime.Minutes * 60;
             SongProgressBar.Value = 0;
+            CurrentTimeSong.Text = _player.CurrentTime.ToString(@"hh\:mm\:ss");
+            TotalTimeSong.Text = _player.TotalTime.ToString(@"hh\:mm\:ss");
 
-            //SongsList.SelectedIndex = 0;
-        }
-        private void NextSongButton_Click(object sender, EventArgs e)
-        {
-            player.SetNextSong();
-            ScreenRefresh();
-        }
-        private void PrevSongButton_Click(object sender, EventArgs e)
-        {
-            player.SetPrevSong();
-            ScreenRefresh();
-        }
-        private void PlayButton_Click(object sender, EventArgs e)
-        {
-            if (PlayButton.Text == "Play")
-            {
-                PlayButton.Text = "Stop";
-                player.Play();
-            }
-            else if (PlayButton.Text == "Stop")
-            {
-                PlayButton.Text = "Play";
-                player.Stop();
-            }
-        }
-        private void MixSongButton_Click(object sender, EventArgs e)
-        {
 
         }
-        private void VolumeBar_Scroll(object sender, EventArgs e)
-        {
-            player.Volume = ((float)VolumeBar.Value / 100);
-            Volume.Text = VolumeBar.Value.ToString();
-        }
-        private void SongProgressBar_Scroll(object sender, EventArgs e)
-        {
-            player.CurrentTime = TimeSpan.FromSeconds(SongProgressBar.Value);
-        }
-        private void FileButton_Click(object sender, EventArgs e)
-        {
-            var result = folderBrowserDialog1.ShowDialog();
-            if (result == DialogResult.OK)
-            {
-                player.SetNewFolder(folderBrowserDialog1.SelectedPath);
-                SongsList.Items.Clear();
-                SongsList.Items.AddRange(player.GetSongsList().
-                    Select(x => x.Name).ToArray());
-            }
-        }
-        private void SongsList_DoubleClicked(object sender, EventArgs e)
-        {
 
-        }
     }
-       
+
 }
